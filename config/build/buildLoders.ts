@@ -3,10 +3,11 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import ReactRefreshTypescript from 'react-refresh-typescript';
 
 import { BuildOptions } from './types';
+import { buildBabelLoader } from './babel/buildBabelLoader';
 
-export const buildLoader = ({
-  isDev,
-}: BuildOptions): ModuleOptions['rules'] => {
+export const buildLoader = (options: BuildOptions): ModuleOptions['rules'] => {
+  const { isDev } = options;
+
   const cssLoaderWithModules = {
     loader: 'css-loader',
     options: {
@@ -33,21 +34,23 @@ export const buildLoader = ({
         'sass-loader',
       ],
     },
-    {
-      test: /\.tsx?$/,
-      use: [
-        {
-          loader: 'ts-loader',
-          options: {
-            transpileOnly: true,
-            getCustomTransformers: () => ({
-              before: [isDev && ReactRefreshTypescript()].filter(Boolean),
-            }),
-          },
-        },
-      ],
-      exclude: /node_modules/,
-    },
+    // {
+    //   test: /\.tsx?$/,
+    //   use: [
+    //     {
+    //       loader: 'ts-loader',
+    //       options: {
+    //         transpileOnly: true,
+    //         getCustomTransformers: () => ({
+    //           before: [isDev && ReactRefreshTypescript()].filter(Boolean),
+    //         }),
+    //       },
+    //     },
+    //   ],
+    //   exclude: /node_modules/,
+    // },
+    buildBabelLoader(options),
   ];
+
   return loader;
 };
